@@ -7,7 +7,7 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import com.codeazur.utils.XMLUtils;
+			import com.codeazur.utils.XMLUtil;
 			import flash.events.Event;
 			import flash.events.MouseEvent;
 			import mx.collections.ArrayCollection;
@@ -35,7 +35,7 @@
 			protected function domInitHandler(event:Event):void {
 				if(!loader.loaded) { return; }
 				use namespace XHTMLNS;
-				var links:XMLList = XMLUtils.jsDomToE4X(loader.window.document)..li..h3.a.@href;
+				var links:XMLList = XMLUtil.jsDomToE4X(loader.window.document)..li..h3.a.@href;
 				for(var i:uint = 0; i < links.length(); i++) {
 					results.addItem(links[i]);
 				}

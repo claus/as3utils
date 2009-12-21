@@ -1,6 +1,6 @@
 package com.codeazur.utils
 {
-	public class XMLUtils
+	public class XMLUtil
 	{		
 		public static function jsDomToE4X(domElement:Object):XML {
 			return _jsDomToE4X(domElement);
