@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/halo"
+	initialize="initializeHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.codeazur.utils.XMLUtils;
+			import flash.events.Event;
+			import flash.events.MouseEvent;
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			public namespace XHTMLNS = "http://www.w3.org/1999/xhtml";
+			protected static const URL:String = "http://www.google.com/search?q=filetype:swf%20skip%20intro&ie=utf-8&oe=utf-8";
+			protected var loader:HTMLLoader;
+			
+			[Bindable]
+			public var results:ArrayCollection;
+			
+			protected function initializeHandler(event:FlexEvent):void {
+				loader = new HTMLLoader();
+				loader.addEventListener(Event.HTML_DOM_INITIALIZE, domInitHandler);
+				loader.addEventListener(Event.COMPLETE, domInitHandler);
+				results = new ArrayCollection();
+			}
+			
+			protected function searchHandler(event:MouseEvent):void {
+				loader.load(new URLRequest(searchterm.text));
+				results.removeAll();
+			}
+			
+			protected function domInitHandler(event:Event):void {
+				if(!loader.loaded) { return; }
+				use namespace XHTMLNS;
+				var links:XMLList = XMLUtils.jsDomToE4X(loader.window.document)..li..h3.a.@href;
+				for(var i:uint = 0; i < links.length(); i++) {
+					results.addItem(links[i]);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
+	</s:layout>
+	
+	<s:HGroup width="100%">
+		<s:TextInput id="searchterm" width="100%" text="{URL}" />
+		<s:Button label="Search" click="searchHandler(event)" />
+	</s:HGroup>
+	
+	<s:List id="result" dataProvider="{results}" width="100%" height="100%" />
+	
+</s:WindowedApplication>
