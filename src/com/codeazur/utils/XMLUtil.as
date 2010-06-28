@@ -34,7 +34,19 @@ package com.codeazur.utils
 						break;
 					case JSDOM_TEXT_NODE:
 						// This is a text node: append the string value as the only child
-						xml.appendChild(element.nodeValue);
+						var textnode:XML;
+						try {
+							textnode = XML(element.nodeValue);
+						} catch(error:TypeError) {
+							try {
+								textnode = XML("<![CDATA[" + element.nodeValue + "]]>");
+							} catch(error:TypeError) {
+								trace(error);
+							}
+						}
+						if(textnode && textnode.toXMLString().length > 0) {
+							xml.appendChild(textnode);
+						}
 						break;
 					case JSDOM_COMMENT_NODE:
 						// This is a comment node.
@@ -42,13 +54,13 @@ package com.codeazur.utils
 							xml.appendChild(XML("<!--" + element.nodeValue + "-->"));
 						}
 						break;
+					case JSDOM_DOCUMENT_TYPE_NODE:
 					case JSDOM_ATTRIBUTE_NODE:
 					case JSDOM_CDATA_SECTION_NODE:
 					case JSDOM_ENTITY_REFERENCE_NODE:
 					case JSDOM_ENTITY_NODE:
 					case JSDOM_PROCESSING_INSTRUCTION_NODE:
 					case JSDOM_DOCUMENT_NODE:
-					case JSDOM_DOCUMENT_TYPE_NODE:
 					case JSDOM_DOCUMENT_FRAGMENT_NODE:
 					case JSDOM_NOTATION_NODE:
 						// TODO: Implement other node types (CData would be handy, etc)
@@ -58,6 +70,26 @@ package com.codeazur.utils
 				element = element.nextSibling;
 			}
 			return xml;
+		}
+		
+		public static function getCharacterData(xml:XML):String {
+			return _getCharacterData(xml);
+		}
+		
+		private static function _getCharacterData(xml:XML):String {
+			if(xml.hasSimpleContent()) {
+				return xml.text();
+			} else {
+				var desc:XMLList = xml.descendants();
+				var descNum:int = desc.length();
+				var text:String = "";
+				for(var i:uint = 0; i < descNum; i++) {
+					if(desc[i].nodeKind() == "text") {
+						text += desc[i];
+					}
+				}
+				return text;
+			}
 		}
 		
 		private static const JSDOM_ELEMENT_NODE:uint = 1;
